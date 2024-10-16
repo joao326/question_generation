@@ -164,11 +164,11 @@ class QGPipeline:
 
                     # Inserir os marcadores <h1> na sentença original
                     sent = f"{sent[:ans_start_idx_orig]} <h1> {sent[ans_start_idx_orig:ans_end_idx_orig]} <h1> {sent[ans_end_idx_orig:]}"
-                    sent_copy[i] = sent
+                    sents_copy[i] = sent
 
                     source_text = " ".join(sents_copy)
                     source_text = f"generate question: {source_text}"
-                    if self.model_type = "t5":
+                    if self.model_type == "t5":
                         source_text = source_text + " </s>"
 
                     input.append({"answer": answer_text, "source_text": source_text})
