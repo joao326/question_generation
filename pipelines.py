@@ -90,6 +90,14 @@ class QGPipeline:
         dec = [self.ans_tokenizer.decode(ids, skip_special_tokens=False) for ids in outs]
         answers = [item.split('<sep>') for item in dec]
         answers = [i[:-1] for i in answers]
+
+        # inicio adição
+        # Adicionar prints para verificar as respostas
+        for sent, ans in zip(sents, answers):
+            print(f"Sentença: {sent}")
+            print(f"Respostas extraídas: {ans}")
+
+        # fim adição
         
         return sents, answers
     
@@ -138,6 +146,38 @@ class QGPipeline:
                 sents_copy = sents[:]
                 
                 answer_text = answer_text.strip()
+                
+                # inicio adição
+                sent = sent.strip() 
+                
+                    # normalizar para minúsculas
+                answer_text_lower = answer_text.lower()
+                sent_lower = sent.lower()
+
+                if answer_text_lower in sent_lower:
+                    ans_start_idx = sent_lower.index(answer_text_lower)
+                    ans_end_idx = ans_start_idx + len(answer_text_lower)
+
+                    # Mapear para os índices na sentença original
+                    ans_start_idx_orig = sent.lower().find(answer_text_lower)
+                    ans_end_idx_orig = ans_start_idx_orig + len(answer_text)
+
+                    # Inserir os marcadores <h1> na sentença original
+                    sent = f"{sent[:ans_start_idx_orig]} <h1> {sent[ans_start_idx_orig:ans_end_idx_orig]} <h1> {sent[ans_end_idx_orig:]}"
+                    sent_copy[i] = sent
+
+                    source_text = " ".join(sents_copy)
+                    source_text = f"generate question: {source_text}"
+                    if self.model_type = "t5":
+                        source_text = source_text + " </s>"
+
+                    input.append({"answer": answer_text, "source_text": source_text})
+                else:
+                    print(f"A resposta '{answer_text}' não foi encontrada na sentença '{sent}'. Pulando esta resposta.")
+                    continue
+                return inputs
+
+                # fim adição
                 
                 ans_start_idx = sent.index(answer_text)
                 
