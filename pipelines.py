@@ -172,6 +172,11 @@ class QGPipeline:
                 # Debugging: Print the sentence and answer to understand why the index might fail
                 logger.debug(f"Processing sentence: {sent}")
                 logger.debug(f"Processing answer: {answer_text}")
+
+                # inicio_adicao
+                if '<pad>' in answer_text:
+                    answer_text = answer_text.replace('<pad>', '').strip()
+                # fim_adicao
                 
                 # Find the start index of the answer in the sentence
                 ans_start_idx = sent.find(answer_text)
