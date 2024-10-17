@@ -117,7 +117,13 @@ class QGPipeline:
         # Remove the last element (which is empty) from each list of answers
         answers = [i[:-1] for i in answers]
         
-        return sents, answers
+        # Remove <pad> tokens from each answer
+        cleaned_answers = []
+        for answer_list in answers:
+            cleaned_answer_list = [answer.replace('<pad>', '').strip() for answer in answer_list]
+            cleaned_answers.append(cleaned_answer_list)
+        
+        return sents, cleaned_answers
     
     def _tokenize(self,
         inputs,
@@ -353,14 +359,14 @@ SUPPORTED_TASKS = {
 # Optional (Se não especificado será None(ou highlight no caso de qg_format)).
 
 def pipeline(
-    task: str, # question-genearation, multitask-qa-qg, e2e-qg
+    task: str, # question-generation, multitask-qa-qg, e2e-qg
     model: Optional = None,
     tokenizer: Optional[Union[str, PreTrainedTokenizer]] = None,
     qg_format: Optional[str] = "highlight", # highlight ou prepend
     ans_model: Optional = None,
     ans_tokenizer: Optional[Union[str, PreTrainedTokenizer]] = None,
     use_cuda: Optional[bool] = True, # Usar GPU?
-    **kwargs, # argumentos adicionais
+    **kwargs,
 ):
     # Retrieve the task
     if task not in SUPPORTED_TASKS:
@@ -374,9 +380,8 @@ def pipeline(
         model = targeted_task["default"]["model"]
     
     # Try to infer tokenizer from model or config name (if provided as str)
-    # Inferir == tentar deduzir, adivinhar
     if tokenizer is None:
-        if isinstance(model, str): # objeto é instância de classe?
+        if isinstance(model, str):
             tokenizer = model
         else:
             # Impossible to guess what is the right tokenizer here
@@ -398,7 +403,7 @@ def pipeline(
         model = AutoModelForSeq2SeqLM.from_pretrained(model)
     
     if task == "question-generation":
-        if ans_model is None: #ans_model == modelo para extração de respostas
+        if ans_model is None:
             # Load default answer extraction model
             ans_model = targeted_task["default"]["ans_model"]
             ans_tokenizer = AutoTokenizer.from_pretrained(ans_model)
