@@ -176,6 +176,7 @@ class QGPipeline:
                 # inicio_adicao
                 if '<pad>' in answer_text:
                     answer_text = answer_text.replace('<pad>', '').strip()
+                    print(f"Answer without <pad>: '{answer_text}'")
                 # fim_adicao
                 
                 # Find the start index of the answer in the sentence
